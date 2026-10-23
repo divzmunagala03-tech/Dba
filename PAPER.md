@@ -2,7 +2,9 @@
 
 **Article type.** Short communication
 
-**Authors and affiliations.** To be completed before submission. One author must be named the corresponding author, with an e-mail address and a full postal address.
+**Author.** Divya Munagala, corresponding author.
+
+Affiliation, e-mail address, and full postal address are still required before submission.
 
 ## Highlights
 
@@ -172,15 +174,15 @@ The cohorts are synthetic. `ews.py` generates the ventures, fits every model, ch
 
 ## Declaration of competing interest
 
-The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this manuscript.
+The author declares that she has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this manuscript.
 
 ## Declaration of generative AI and AI-assisted technologies in the manuscript preparation process
 
-During the preparation of this work the author(s) used Cursor, with large language model assistance, for language drafting, organization, and code structuring. After using this tool/service, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the published article. The experimental results, tables, and figures were produced by executing `ews.py`.
+During the preparation of this work the author used Cursor, with large language model assistance, for language drafting, organization, and code structuring. After using this tool, the author reviewed and edited the content as needed and takes full responsibility for the content of the published article. The experimental results, tables, and figures were produced by executing `ews.py`.
 
 ## CRediT authorship contribution statement
 
-To be completed when the author list is fixed. Corresponding authors must assign CRediT roles before submission. No roles are asserted here, because no author names are on the manuscript.
+**Divya Munagala:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing – original draft, Writing – review and editing, Visualization.
 
 ## Funding
 
