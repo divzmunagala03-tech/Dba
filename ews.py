@@ -2,8 +2,10 @@
 
 A reproducible multi-cohort benchmark. Committee rules are coded on the
 operational venture state. Statistical models see noisy measurements of
-that state. The warning score adds rule evidence to a gradient-boosting
-log-odds. Every number in PAPER.md is written by this file.
+that state. The warning score adds rule evidence to a logistic log-odds.
+The same file then re-selects the evidence weight at two other miss
+costs and repeats the comparison after the predicates are flipped.
+Every number in PAPER.md is written by this file.
 
 Run: python ews.py
 """
@@ -30,6 +32,11 @@ N_COHORTS = 120
 N_VENTURES = 380
 MISS_WEIGHT = 5.0
 FALSE_ALARM_WEIGHT = 1.0
+SENSITIVITY_WEIGHTS = (3.0, 8.0)
+STRESS_SEED0 = 12000
+N_STRESS = 60
+STRESS_FLIP = 0.15
+LAMBDA_GRID = np.linspace(0.0, 3.0, 16)
 
 # Expert evidence weights. These are not the data-generating coefficients.
 RULES = [
@@ -110,13 +117,13 @@ def generate_cohort(rng: np.random.Generator, n: int = N_VENTURES):
     return noisy, y, fired, risk
 
 
-def objective_parts(y, score, risk, tau):
+def objective_parts(y, score, risk, tau, miss_weight=MISS_WEIGHT):
     """Per-firm decision cost, plus miss rates inside each failure mode.
 
-    Cost = (5 * missed failures + 1 * false alarms) / n.
+    Cost = (miss_weight * missed failures + 1 * false alarms) / n.
     Alerting every firm therefore costs about the non-failure rate, and a
     warning is useful only when it cuts missed failures by more than the
-    false alarms it adds.
+    false alarms it adds. The primary benchmark uses miss_weight 5.
     """
     alert = score >= tau
     rule_fail = (y == 1) & risk
@@ -129,7 +136,7 @@ def objective_parts(y, score, risk, tau):
             return 0.0
         return float((~alert & group).sum() / group.sum())
 
-    cost = float((MISS_WEIGHT * missed.sum() + FALSE_ALARM_WEIGHT * false_alarms.sum()) / len(y))
+    cost = float((miss_weight * missed.sum() + FALSE_ALARM_WEIGHT * false_alarms.sum()) / len(y))
     negatives = max(int((y == 0).sum()), 1)
     false_alarm_rate = float(false_alarms.sum() / negatives)
     justified = float((alert & risk).sum() / alert.sum()) if alert.any() else 0.0
@@ -140,14 +147,26 @@ def decision_objective(parts) -> float:
     return float(parts[0])
 
 
-def best_threshold(y, score, risk) -> float:
+def best_threshold(y, score, risk, miss_weight=MISS_WEIGHT) -> float:
     grid = np.unique(np.quantile(score, np.linspace(0.05, 0.95, 41)))
     best_tau, best_j = float(np.median(score)), 1e18
     for tau in grid:
-        value = decision_objective(objective_parts(y, score, risk, float(tau)))
+        value = decision_objective(objective_parts(y, score, risk, float(tau), miss_weight))
         if value < best_j:
             best_tau, best_j = float(tau), value
     return best_tau
+
+
+def choose_lambda(p_lin, evidence, y, risk, miss_weight=MISS_WEIGHT) -> float:
+    """Smallest grid weight that minimizes validation decision cost."""
+    best = None
+    for lam in LAMBDA_GRID:
+        score = sigmoid(logit(p_lin) + lam * evidence)
+        tau = best_threshold(y, score, risk, miss_weight)
+        value = decision_objective(objective_parts(y, score, risk, tau, miss_weight))
+        if best is None or value < best[0]:
+            best = (value, float(lam))
+    return best[1]
 
 
 def _gbdt() -> GradientBoostingClassifier:
@@ -161,15 +180,20 @@ def _gbdt() -> GradientBoostingClassifier:
     )
 
 
-def evaluate_cohort(cohort_id: int) -> dict:
-    rng = np.random.default_rng(SEED0 + cohort_id)
+def evaluate_cohort(cohort_id: int, seed: int | None = None, flip_p: float = 0.0, with_sensitivity: bool = False) -> dict:
+    seed = SEED0 + cohort_id if seed is None else int(seed)
+    rng = np.random.default_rng(seed)
     measured, y, fired, risk = generate_cohort(rng)
     if len(np.unique(y)) < 2:
         raise RuntimeError(f"Cohort {cohort_id} has a single class.")
+    # Stress path: each predicate is flipped before the evidence is summed.
+    # The failure label and the clean risk flag are left as drawn.
+    if flip_p > 0:
+        fired = np.where(rng.random(fired.shape) < flip_p, 1.0 - fired, fired)
     evidence = fired @ CF
     index = np.arange(len(y))
-    train, test = train_test_split(index, test_size=0.30, stratify=y, random_state=SEED0 + cohort_id)
-    fit, val = train_test_split(train, test_size=0.25, stratify=y[train], random_state=SEED0 + cohort_id + 17)
+    train, test = train_test_split(index, test_size=0.30, stratify=y, random_state=seed)
+    fit, val = train_test_split(train, test_size=0.25, stratify=y[train], random_state=seed + 17)
 
     gbdt = _gbdt()
     gbdt.fit(measured[fit], y[fit])
@@ -190,14 +214,7 @@ def evaluate_cohort(cohort_id: int) -> dict:
     # The measured fields are mostly additive. Rule evidence carries the
     # conjunctions a linear score cannot represent, so the knowledge weight
     # is applied to the logistic log-odds rather than to the tree score.
-    best = None
-    for lam in np.linspace(0.0, 3.0, 16):
-        score = sigmoid(logit(p_lin_val) + lam * evidence[val])
-        tau = best_threshold(y[val], score, risk[val])
-        value = decision_objective(objective_parts(y[val], score, risk[val], tau))
-        if best is None or value < best[0]:
-            best = (value, float(lam))
-    lam = best[1]
+    lam = choose_lambda(p_lin_val, evidence[val], y[val], risk[val], MISS_WEIGHT)
     kg_val = sigmoid(logit(p_lin_val) + lam * evidence[val])
     kg_test = sigmoid(logit(p_lin_test) + lam * evidence[test])
 
@@ -220,6 +237,18 @@ def evaluate_cohort(cohort_id: int) -> dict:
         record[f"{name}_miss_smooth"] = miss_smooth
         record[f"{name}_false_alarm"] = false_alarm
         record[f"{name}_justified"] = justified
+
+    if with_sensitivity:
+        for weight in SENSITIVITY_WEIGHTS:
+            tag = f"w{int(weight)}"
+            lam_w = choose_lambda(p_lin_val, evidence[val], y[val], risk[val], weight)
+            kg_val_w = sigmoid(logit(p_lin_val) + lam_w * evidence[val])
+            kg_test_w = sigmoid(logit(p_lin_test) + lam_w * evidence[test])
+            tau_lin = best_threshold(y[val], p_lin_val, risk[val], weight)
+            tau_kg = best_threshold(y[val], kg_val_w, risk[val], weight)
+            record[f"lambda_{tag}"] = lam_w
+            record[f"lin_j_{tag}"] = objective_parts(y[test], p_lin_test, risk[test], tau_lin, weight)[0]
+            record[f"kg_j_{tag}"] = objective_parts(y[test], kg_test_w, risk[test], tau_kg, weight)[0]
 
     case = _representative_case(
         y[test], risk[test], fired[test], evidence[test],
@@ -282,16 +311,27 @@ def summarize(frame: pd.DataFrame) -> dict:
             base = frame[f"{method}{suffix}"].to_numpy()
             if expect_kg_lower:
                 result = stats.wilcoxon(base, kg, alternative="greater", zero_method="wilcox")
-                gap = float((base - kg).mean())
+                diff = base - kg
             else:
                 result = stats.wilcoxon(kg, base, alternative="greater", zero_method="wilcox")
-                gap = float((kg - base).mean())
+                diff = kg - base
+            mean = float(diff.mean())
+            sd = float(diff.std(ddof=1))
+            half = float(stats.t.ppf(0.975, len(diff) - 1) * sd / np.sqrt(len(diff)))
+            better = diff[diff > 0]
+            worse = diff[diff < 0]
             tests.append({
                 "comparison": f"KG-EWS vs {label}",
                 "metric": metric,
                 "kg_mean": float(kg.mean()),
                 "baseline_mean": float(base.mean()),
-                "mean_advantage": gap,
+                "mean_advantage": mean,
+                "ci95": [mean - half, mean + half],
+                "n_better": int((diff > 0).sum()),
+                "n_worse": int((diff < 0).sum()),
+                "n_tie": int((diff == 0).sum()),
+                "mean_when_better": float(better.mean()) if len(better) else None,
+                "mean_when_worse": float(worse.mean()) if len(worse) else None,
                 "p_value": float(result.pvalue),
             })
     summary["tests"] = tests
@@ -371,33 +411,50 @@ def plot_results(path: Path, summary: dict) -> None:
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9})
     methods = ["lin", "kb", "ai", "kg"]
     labels = ["Logistic\nregression", "Knowledge\nbase", "Gradient\nboosting", "KG-EWS"]
-    colors = ["#78716c", "#0f766e", "#1d4ed8", "#c2410c"]
-    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.7), dpi=300)
+    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.85), dpi=300)
     fig.patch.set_facecolor("white")
 
+    order = ("Logistic regression", "Knowledge base", "Gradient boosting")
+    by_name = {row["comparison"]: row for row in summary["tests"] if row["metric"] == "objective"}
+    rows = [by_name[f"KG-EWS vs {name}"] for name in order]
+    means = [row["mean_advantage"] for row in rows]
+    lows = [row["mean_advantage"] - row["ci95"][0] for row in rows]
+    highs = [row["ci95"][1] - row["mean_advantage"] for row in rows]
+    colors = ["#78716c", "#0f766e", "#1d4ed8"]
+    tick_labels = ["Versus\nlogistic regression", "Versus\nknowledge base", "Versus\ngradient boosting"]
+
     ax = axes[0]
-    means = [summary[m]["j"]["mean"] for m in methods]
-    lows = [summary[m]["j"]["mean"] - summary[m]["j"]["ci95"][0] for m in methods]
-    highs = [summary[m]["j"]["ci95"][1] - summary[m]["j"]["mean"] for m in methods]
-    xpos = np.arange(len(methods))
-    ax.bar(xpos, means, color=colors, width=0.72, zorder=2)
+    xpos = np.arange(len(rows))
+    ax.axhline(0.0, color="#1c1917", linewidth=0.9, zorder=1)
+    ax.bar(xpos, means, color=colors, width=0.68, zorder=2)
     ax.errorbar(xpos, means, yerr=[lows, highs], fmt="none", ecolor="#1c1917", elinewidth=1.0, capsize=3, zorder=3)
+    span = max(highs[i] + abs(means[i]) for i in range(len(means)))
+    for i, row in enumerate(rows):
+        ax.text(
+            i, means[i] + highs[i] + 0.012 * max(span, 0.05),
+            f"{means[i]:.3f}", ha="center", va="bottom", fontsize=8, color="#1c1917",
+        )
     ax.set_xticks(xpos)
-    ax.set_xticklabels(labels)
-    ax.set_ylabel("Decision cost per firm   (lower is better)")
-    ax.set_title("(a)  Decision cost across cohorts", loc="left", fontsize=11, color="#1c1917")
+    ax.set_xticklabels(tick_labels)
+    ax.set_ylabel("Paired cost reduction per firm\n(baseline − KG-EWS)")
+    ax.set_title("(a)  Paired cost advantage of KG-EWS", loc="left", fontsize=11, color="#1c1917")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.grid(axis="y", color="#e7e5e4", zorder=0)
     ax.set_axisbelow(True)
+    floor = min(0.0, min(means[i] - lows[i] for i in range(len(means))))
+    ceiling = max(means[i] + highs[i] for i in range(len(means)))
+    pad = 0.08 * max(ceiling - floor, 0.05)
+    ax.set_ylim(floor - pad, ceiling + 3.2 * pad)
 
     ax = axes[1]
     width = 0.36
+    group = np.arange(len(methods))
     miss_r = [summary[m]["miss_rule"]["mean"] for m in methods]
     false_alarm = [summary[m]["false_alarm"]["mean"] for m in methods]
-    ax.bar(xpos - width / 2, miss_r, width=width, color="#9f1239", label="Missed rule-triggered failures", zorder=2)
-    ax.bar(xpos + width / 2, false_alarm, width=width, color="#57534e", label="False alarms among surviving firms", zorder=2)
-    ax.set_xticks(xpos)
+    ax.bar(group - width / 2, miss_r, width=width, color="#9f1239", label="Missed rule-triggered failures", zorder=2)
+    ax.bar(group + width / 2, false_alarm, width=width, color="#57534e", label="False alarms among surviving firms", zorder=2)
+    ax.set_xticks(group)
     ax.set_xticklabels(labels)
     ax.set_ylim(0, 1.05)
     ax.set_ylabel("Rate at the validation threshold")
@@ -416,14 +473,64 @@ def plot_results(path: Path, summary: dict) -> None:
     plt.close(fig)
 
 
+def _sensitivity(frame: pd.DataFrame) -> dict:
+    """Re-selected λ and τ at miss weights other than the primary 5:1 cost."""
+    out = {}
+    for weight in SENSITIVITY_WEIGHTS:
+        tag = f"w{int(weight)}"
+        diff = frame[f"lin_j_{tag}"].to_numpy() - frame[f"kg_j_{tag}"].to_numpy()
+        result = stats.wilcoxon(frame[f"lin_j_{tag}"], frame[f"kg_j_{tag}"], alternative="greater", zero_method="wilcox")
+        mean = float(diff.mean())
+        sd = float(diff.std(ddof=1))
+        half = float(stats.t.ppf(0.975, len(diff) - 1) * sd / np.sqrt(len(diff)))
+        out[tag] = {
+            "miss_weight": weight,
+            "lambda_mean": float(frame[f"lambda_{tag}"].mean()),
+            "lambda_positive": float((frame[f"lambda_{tag}"] > 0).mean()),
+            "lin_cost": float(frame[f"lin_j_{tag}"].mean()),
+            "kg_cost": float(frame[f"kg_j_{tag}"].mean()),
+            "mean_advantage": mean,
+            "ci95": [mean - half, mean + half],
+            "n_better": int((diff > 0).sum()),
+            "n_worse": int((diff < 0).sum()),
+            "n_tie": int((diff == 0).sum()),
+            "p_value": float(result.pvalue),
+        }
+    return out
+
+
 def main() -> None:
-    records = [evaluate_cohort(cohort_id) for cohort_id in range(N_COHORTS)]
-    cases = [record.pop("case") for record in records]
+    records = []
+    cases = []
+    for cohort_id in range(N_COHORTS):
+        record = evaluate_cohort(cohort_id, with_sensitivity=True)
+        cases.append(record.pop("case"))
+        record["block"] = "main"
+        records.append(record)
     cases = [case for case in cases if case is not None]
     case = max(cases, key=lambda item: item["p_kg"] - item["p_lin"])
+
+    stress_records = []
+    for cohort_id in range(N_STRESS):
+        record = evaluate_cohort(
+            cohort_id,
+            seed=STRESS_SEED0 + cohort_id,
+            flip_p=STRESS_FLIP,
+            with_sensitivity=False,
+        )
+        record.pop("case", None)
+        record["block"] = "stress"
+        stress_records.append(record)
+
     frame = pd.DataFrame(records)
-    frame.to_csv(ROOT / "cohort_results.csv", index=False)
+    stress = pd.DataFrame(stress_records)
+    pd.concat([frame, stress], ignore_index=True).to_csv(ROOT / "cohort_results.csv", index=False)
     summary = summarize(frame)
+    summary["sensitivity"] = _sensitivity(frame)
+    summary["stress"] = summarize(stress)
+    summary["stress"]["n_cohorts"] = int(len(stress))
+    summary["stress"]["flip_p"] = STRESS_FLIP
+    summary["stress"]["seed0"] = STRESS_SEED0
     summary["case"] = case
     summary["n_ventures"] = N_VENTURES
     summary["miss_weight"] = MISS_WEIGHT

@@ -7,10 +7,10 @@ KG-EWS adds eight committee rules to the log-odds of a logistic score. The rules
 ## Run
 
 ```bash
-python ews.py
+python3 ews.py
 ```
 
-The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`, and `results.json`. Cohort seeds are 9000 through 9119. No network connection and no external data file are required.
+The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`, and `results.json`. Primary cohort seeds are 9000 through 9119. A predicate-flip block uses seeds 12000 through 12059. No network connection and no external data file are required.
 
 ## Files
 
@@ -19,12 +19,12 @@ The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`
 | `ews.py` | Generator, rules, models, paired tests, figures |
 | `PAPER.md` | Short communication: two figures and two tables |
 | `fig1_architecture.png` | Warning card and one rule-triggered test case |
-| `fig2_results.png` | Decision cost and the false-alarm tradeoff |
-| `cohort_results.csv` | One row per cohort, the source of both tables |
+| `fig2_results.png` | Paired cost advantage and the false-alarm tradeoff |
+| `cohort_results.csv` | Primary cohorts and the predicate-flip cohorts |
 
 ## What the experiment claims
 
-On 120 cohorts, KG-EWS has the lowest decision cost and the highest AUC among logistic regression, gradient boosting, the rules alone, and the combined score. The rules alone alarm on most surviving firms. The gain over logistic regression is small and paired. The data are not a field sample and there is no failure date.
+On 120 cohorts, KG-EWS has the lowest decision cost and the highest AUC among logistic regression, gradient boosting, the rules alone, and the combined score. The rules alone alarm on most surviving firms. The gain over logistic regression is small, paired, and absent from the cohorts that set the evidence weight to zero. It remains at a miss weight of 3, is not detectable at a miss weight of 8, and does not survive flipping each predicate with probability 0.15. The data are not a field sample and there is no failure date.
 
 ## Manuscript note
 
