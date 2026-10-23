@@ -174,7 +174,7 @@ The cohorts are synthetic. `ews.py` generates the ventures, fits every model, ch
 
 ## Declaration of competing interest
 
-The author declares that she has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this manuscript.
+The author declares that there are no known competing financial interests or personal relationships that could have appeared to influence the work reported in this manuscript.
 
 ## Declaration of generative AI and AI-assisted technologies in the manuscript preparation process
 

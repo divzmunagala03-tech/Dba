@@ -2,6 +2,11 @@
 
 Short communication and the program that produces its cohorts, figures, tables, and tests.
 
+The manuscript is in this repository:
+
+- [PAPER.md](PAPER.md) — the manuscript, readable on GitHub
+- [manuscript.docx](manuscript.docx) — the same manuscript as a Word file
+
 KG-EWS adds eight committee rules to the log-odds of a logistic score. The rules cover capability, innovation, team, runway, and traction in an entrepreneurial firm that is trying to transform digitally. The benchmark is synthetic and seeded. Every number in `PAPER.md` comes from `ews.py`.
 
 ## Run
@@ -17,7 +22,8 @@ The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`
 | File | Role |
 | --- | --- |
 | `ews.py` | Generator, rules, models, paired tests, figures |
-| `PAPER.md` | Short communication: two figures and two tables |
+| `PAPER.md` | Manuscript source: two figures and two tables |
+| `manuscript.docx` | The same manuscript as a Word file |
 | `fig1_architecture.png` | Warning card and one rule-triggered test case |
 | `fig2_results.png` | Paired cost advantage and the false-alarm tradeoff |
 | `cohort_results.csv` | Primary cohorts and the predicate-flip cohorts |
