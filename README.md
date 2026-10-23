@@ -34,6 +34,16 @@ The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`
 
 On 120 cohorts, KG-EWS has the lowest decision cost and the highest AUC among logistic regression, gradient boosting, the rules alone, and the combined score. The rules alone alarm on most surviving firms. The gain over logistic regression is small, paired, and absent from the cohorts that set the evidence weight to zero. It remains at a miss weight of 3, is not detectable at a miss weight of 8, and does not survive flipping each predicate with probability 0.15. The data are not a field sample and there is no failure date.
 
+## Highlights
+
+Knowledge-Based Systems asks for these as a separate file, not inside the manuscript. Each bullet is at most 85 characters.
+
+- KG-EWS adds committee-rule evidence to a logistic warning score.
+- Validation sets the evidence weight from a five-to-one miss cost.
+- Across 120 cohorts the paired cost gain over logistic regression is 0.024.
+- That gain remains at a three-to-one cost and is lost if predicates are flipped.
+- Rules alone catch failures by alarming on most surviving firms.
+
 ## Manuscript note
 
-Add author names before submission. Knowledge-Based Systems limits a short communication to 10 double-spaced pages, including tables and figures.
+The formatted manuscript follows the short-communication layout of the reference document: title, article type, author, abstract, keywords, numbered sections, table notes, figure captions, declarations, and author-year references. Affiliation, e-mail, and full postal address are still required before submission. Knowledge-Based Systems limits a short communication to 10 double-spaced pages, including tables and figures.

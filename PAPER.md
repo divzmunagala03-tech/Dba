@@ -1,18 +1,10 @@
 # A knowledge-guided early-warning system for digital-transformation failure in entrepreneurial firms
 
-**Article type.** Short communication
+::: {.frontmatter}
+Short Communication
 
-**Author.** Divya Munagala, corresponding author.
-
-Affiliation, e-mail address, and full postal address are still required before submission.
-
-## Highlights
-
-- KG-EWS adds committee-rule evidence to a logistic warning score.
-- Validation sets the evidence weight from a five-to-one miss cost.
-- Across 120 cohorts the paired cost gain over logistic regression is 0.024.
-- That gain remains at a three-to-one cost and is lost if predicates are flipped.
-- Rules alone catch failures by alarming on most surviving firms.
+Divya Munagala
+:::
 
 ## Abstract
 
@@ -38,7 +30,9 @@ KG-EWS is not a claim that expert weights equal the true failure process. The ex
 
 Let a venture be y = 1 if it fails and y = 0 otherwise. An alert is issued when a score s meets a threshold τ. Write FN for the number of failures with no alert and FP for the number of surviving firms that are alerted, in a cohort of n firms. The decision cost is
 
+::: {.equation}
 J = (5 FN + FP) / n. (1)
+:::
 
 The weight 5 is a preference: missing a failure is treated as five times as costly as one false alarm. It was fixed so that the two terms sit on a comparable scale, not estimated from a loss supplied by an investor. Alerting every firm costs about the share of firms that survive. A useful warning has to cut missed failures by more than the false alarms it adds. The same J is used to choose τ for every method, on the validation slice only.
 
@@ -59,7 +53,9 @@ The knowledge base is a set of eight production rules. Seven raise the failure e
 
 Let zᵢ = 1 when rule i fires and 0 otherwise. The evidence is the signed sum
 
+::: {.equation}
 e = Σᵢ cᵢ zᵢ, (2)
+:::
 
 with expert weights c = (1.00, 0.85, 0.80, 0.95, 0.60, 0.55, 0.75, −1.05) in the order R1 through P1. These weights record direction and a rough magnitude. They are not fitted, and they are not equal to the coefficients of the failure process in Section 3. The construction follows the older idea that pieces of evidence can be written as modular contributions to a belief [20], here as a linear evidence term rather than a certainty-factor update, so that the weight λ in Eq. (3) stays visible.
 
@@ -67,7 +63,9 @@ with expert weights c = (1.00, 0.85, 0.80, 0.95, 0.60, 0.55, 0.75, −1.05) in t
 
 The measured-field model is a class-balanced logistic regression on ten noisy measurements: runway, burn multiple, digital investment, capability, innovation throughput, team digital experience, market turbulence, customer concentration, pivot count, and adoption lag. Predictors are standardized on the fit slice. Let p_Lin be its probability. KG-EWS adds the rule evidence on the log-odds scale,
 
+::: {.equation}
 s = σ( logit(p_Lin) + λ e ), (3)
+:::
 
 where σ is the logistic function and λ ≥ 0 is chosen from the grid {0, 0.2, …, 3.0} to minimize validation J. The alert threshold τ is then chosen on that same validation slice, again by minimizing J. If the rules do not help, the minimum is at λ = 0 and Eq. (3) returns the logistic score.
 
@@ -88,17 +86,19 @@ Output: test scores s and an alert threshold τ
 
 Figure 1a is this card. Figure 1b is one test venture on which the card changes the warning.
 
-![Figure 1. (a) KG-EWS adds committee-rule evidence to a logistic score. (b) A test venture whose rules fire. The measured-field models score it near 0.12 and 0.02. KG-EWS scores it near 1.00.](fig1_architecture.png)
+![](fig1_architecture.png)
 
 **Figure 1.** (a) The warning card. Committee rules are coded on the operational state. The logistic score uses noisy measurements. (b) One rule-triggered test failure. R1, R2, R3, and R7 fire. Logistic probability 0.118, gradient boosting 0.016, rules alone 0.971, KG-EWS 0.999.
 
-## 3. Experimental design
+## 3. Experimental Design
 
 The benchmark is synthetic and seeded. Every cohort can be regenerated from `ews.py` with cohort seed 9000 + k. There are 120 cohorts of 380 ventures. Each cohort is split into a fit slice (52.5%), a validation slice (17.5%), and a test slice (30%), stratified on the failure label. Models are fit once. λ and τ are chosen on the validation slice and frozen before the test slice is scored. Nothing in the reported means is computed on data that chose the weight or the threshold.
 
 The operational state is drawn first. Runway is uniform on 1 to 24 months. Burn is lognormal. Digital investment, capability, innovation, team experience, turbulence, concentration, and adoption lag are beta draws. Pivot count is Poisson. Failure is then a Bernoulli draw with log-odds
 
+::: {.equation}
 η = −2.15 + 0.16(11 − runway) + 0.85(burn − 1.2) + 1.35 turbulence + 1.10 concentration + 1.70 R1 + 1.40 R2 + 1.20 R3 + 1.50 R4 + 1.00 R5 + 0.80 R6 + 1.15 R7 − 1.55 P1 + ε, (4)
+:::
 
 where ε is normal with mean 0 and standard deviation 0.35, and R1…P1 are the rule indicators of Section 2.2. The mean failure rate across cohorts is 32.6%. Of those failures, 35.0% are rule-triggered.
 
@@ -108,11 +108,9 @@ Four scores are compared on every test slice: logistic regression, gradient boos
 
 Two further checks are fixed in the program, not chosen after inspecting test costs. On the same 120 cohorts, λ and τ are selected again at miss weights 3 and 8, a lighter and a heavier preference around the primary weight of 5. Separately, 60 cohorts with seeds 12000 through 12059 flip each of the eight predicate bits independently with probability 0.15 before the evidence is summed. The failure label and the clean risk flag are left as drawn. The flip probability was set before those cohorts were generated. It was not scanned.
 
-## 4. Results and discussion
+## 4. Results and Discussion
 
 Table 1 is the mean across 120 test slices. The 95% interval for the mean cost is 0.579 to 0.617 for KG-EWS and 0.602 to 0.642 for logistic regression. Those two intervals nearly touch, so Figure 2a reports the paired difference inside each cohort rather than the two means side by side. Figure 2b is the trade that produces the cost: missed rule-triggered failures against false alarms among surviving firms.
-
-**Table 1.** Mean test-slice performance over 120 cohorts. Decision cost is Eq. (1). Rule-miss is the share of rule-triggered failures with no alert. Smooth-miss is the share of other failures with no alert. The false-alarm rate is among surviving firms. Lower is better for cost, miss rates, and false alarms. Higher is better for AUC.
 
 | Method | AUC | Decision cost | Rule-miss | Smooth-miss | False-alarm rate |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -121,7 +119,11 @@ Table 1 is the mean across 120 test slices. The 95% interval for the mean cost i
 | Gradient boosting | 0.696 | 0.675 | 0.117 | 0.142 | 0.687 |
 | KG-EWS | 0.765 | 0.598 | 0.067 | 0.194 | 0.536 |
 
-![Figure 2. (a) Paired cost reduction of KG-EWS against each baseline. The 95% interval for logistic regression lies above zero. (b) The knowledge base misses few rule-triggered failures only because it alarms on 92% of surviving firms.](fig2_results.png)
+: **Table 1.** Mean test-slice performance over 120 cohorts.
+
+Decision cost is Eq. (1). Rule-miss is the share of rule-triggered failures with no alert. Smooth-miss is the share of other failures with no alert. The false-alarm rate is among surviving firms. Lower is better for cost, miss rates, and false alarms. Higher is better for AUC.
+
+![](fig2_results.png)
 
 **Figure 2.** (a) Mean paired reduction in decision cost, baseline minus KG-EWS, with a 95% t interval across 120 cohorts. A bar above the zero line favors KG-EWS. (b) Missed rule-triggered failures and false alarms among surviving firms, at the validation threshold.
 
@@ -135,8 +137,6 @@ The trade inside KG-EWS is visible in Table 1 and should not be smoothed over. R
 
 The same four rows are the ablation. Removing the measured model, which leaves the knowledge base, raises mean cost from 0.598 to 0.633 and drops AUC from 0.765 to 0.645. Removing the rules, which leaves logistic regression, raises mean cost by 0.024 and drops AUC by 0.022. The measured-field score is what makes the committee rules usable. The knowledge layer is a smaller correction on top of a strong linear baseline. For a founder watching digital capability [7,8,14], that correction is the part of the card that can be argued in words. It is not, on these cohorts, the larger share of the predictive gain.
 
-**Table 2.** Paired comparisons on the 120 cohort-level test results. The advantage is the baseline cost minus the KG-EWS cost, or the KG-EWS AUC minus the baseline AUC. The interval is a 95% t interval for that mean paired difference. Counts are cohorts in which KG-EWS was better, worse, or tied. The p-value is a one-sided Wilcoxon signed-rank test [25]. Positive advantages favor KG-EWS.
-
 | Comparison | Metric | Advantage | 95% CI | Better / worse / tied | p-value |
 | --- | --- | ---: | --- | ---: | ---: |
 | Versus logistic regression | Decision cost | 0.024 | 0.008 to 0.040 | 59 / 28 / 33 | 1.14×10⁻³ |
@@ -145,6 +145,10 @@ The same four rows are the ablation. Removing the measured model, which leaves t
 | Versus gradient boosting | AUC | 0.069 | 0.061 to 0.076 | 117 / 3 / 0 | 1.30×10⁻²¹ |
 | Versus knowledge base | Decision cost | 0.035 | 0.017 to 0.054 | 81 / 35 / 4 | 2.91×10⁻⁵ |
 | Versus knowledge base | AUC | 0.121 | 0.112 to 0.130 | 119 / 1 / 0 | 2.37×10⁻²¹ |
+
+: **Table 2.** Paired comparisons on the 120 cohort-level test results.
+
+The advantage is the baseline cost minus the KG-EWS cost, or the KG-EWS AUC minus the baseline AUC. The interval is a 95% t interval for that mean paired difference. Counts are cohorts in which KG-EWS was better, worse, or tied. The p-value is a one-sided Wilcoxon signed-rank test [25]. Positive advantages favor KG-EWS.
 
 The gain over logistic regression is the small one, and it is the gain that matters. Logistic regression already fits the additive part of Eq. (4). The rules add the conjunctions that survive measurement noise. An AUC lift of 0.022 and a cost lift of 0.024 is the right size of claim for that addition. It is not a win in every cohort. Of the 33 cost ties, 30 are the cohorts that set λ to 0 and therefore returned the logistic score. Of the 90 cohorts that used the evidence, KG-EWS was cheaper in 59, more expensive in 28, and tied in 3. Where it was cheaper the mean gap was 0.086. Where it was more expensive the mean gap was −0.080. The paired mean stays positive because the favorable gaps are slightly larger and more numerous. The AUC comparison is more consistent: once λ is positive, AUC rises in 84 of those 90 cohorts and falls in 6. The larger gaps against gradient boosting and against the rules alone are mostly gaps between a weak instrument and a suitable one.
 
@@ -168,76 +172,78 @@ There is no clock. A firm is a single draw, not a path observed months before cl
 
 KG-EWS is a warning card for digital-transformation failure in entrepreneurial firms. Eight committee rules supply a signed evidence term. A logistic score supplies the additive risk that can be read from noisy measurements. The validation slice decides how much evidence to add, and whether to add any. On 120 synthetic cohorts the combined score has the lowest decision cost and the highest AUC of the four instruments compared. The rules alone are not a usable policy. The gain over logistic regression is small: cheaper in 59 cohorts, more expensive in 28, and identical in 33. It remains under a 3:1 miss weight, is not detectable under an 8:1 weight, and disappears when each predicate is flipped with probability 0.15. The data are a recovery benchmark whose rules and failure process share their thresholds. That is the claim the experiment supports.
 
-## Data availability
+## Data Availability
 
 The cohorts are synthetic. `ews.py` generates the ventures, fits every model, chooses λ and τ, repeats that choice at miss weights 3 and 8, runs the 60-cohort predicate-flip check, writes `cohort_results.csv`, and redraws both figures. The primary seeds are 9000 through 9119. The stress seeds are 12000 through 12059. The program and the cohort table are in the public repository https://github.com/divzmunagala03-tech/Dba. No external data file is required.
 
-## Declaration of competing interest
+## Declaration of Competing Interest
 
 The author declares that there are no known competing financial interests or personal relationships that could have appeared to influence the work reported in this manuscript.
 
-## Declaration of generative AI and AI-assisted technologies in the manuscript preparation process
+## Declaration of Generative AI and AI-Assisted Technologies
 
 During the preparation of this work the author used Cursor, with large language model assistance, for language drafting, organization, and code structuring. After using this tool, the author reviewed and edited the content as needed and takes full responsibility for the content of the published article. The experimental results, tables, and figures were produced by executing `ews.py`.
-
-## CRediT authorship contribution statement
-
-**Divya Munagala:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing – original draft, Writing – review and editing, Visualization.
 
 ## Funding
 
 This research received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors.
 
+## CRediT Authorship Contribution Statement
+
+**Divya Munagala:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Writing – original draft, Writing – review and editing, Visualization.
+
 ## References
 
-[1] E.I. Altman, Financial ratios, discriminant analysis and the prediction of corporate bankruptcy, The Journal of Finance 23 (1968) 589–609. https://doi.org/10.2307/2978933.
+::: {.refs}
+[1] Altman, E. I. (1968). Financial ratios, discriminant analysis and the prediction of corporate bankruptcy. The Journal of Finance, 23(4), 589–609. https://doi.org/10.2307/2978933
 
-[2] F. Barboza, H. Kimura, E. Altman, Machine learning models and bankruptcy prediction, Expert Systems with Applications 83 (2017) 405–417. https://doi.org/10.1016/j.eswa.2017.04.006.
+[2] Barboza, F., Kimura, H., & Altman, E. (2017). Machine learning models and bankruptcy prediction. Expert Systems with Applications, 83, 405–417. https://doi.org/10.1016/j.eswa.2017.04.006
 
-[3] H.A. Alaka, L.O. Oyedele, H.A. Owolabi, V. Kumar, S.O. Ajayi, O.O. Akinade, M. Bilal, Systematic review of bankruptcy prediction models: Towards a framework for tool selection, Expert Systems with Applications 94 (2018) 164–184. https://doi.org/10.1016/j.eswa.2017.10.040.
+[3] Alaka, H. A., Oyedele, L. O., Owolabi, H. A., Kumar, V., Ajayi, S. O., Akinade, O. O., & Bilal, M. (2018). Systematic review of bankruptcy prediction models: Towards a framework for tool selection. Expert Systems with Applications, 94, 164–184. https://doi.org/10.1016/j.eswa.2017.10.040
 
-[4] J. Sun, H. Li, Q.-H. Huang, K.-Y. He, Predicting financial distress and corporate failure: A review from the state-of-the-art definitions, modeling, sampling, and featuring approaches, Knowledge-Based Systems 57 (2014) 41–56. https://doi.org/10.1016/j.knosys.2013.12.006.
+[4] Sun, J., Li, H., Huang, Q.-H., & He, K.-Y. (2014). Predicting financial distress and corporate failure: A review from the state-of-the-art definitions, modeling, sampling, and featuring approaches. Knowledge-Based Systems, 57, 41–56. https://doi.org/10.1016/j.knosys.2013.12.006
 
-[5] S. Li, S. Wang, A financial early warning logit model and its efficiency verification approach, Knowledge-Based Systems 70 (2014) 78–87. https://doi.org/10.1016/j.knosys.2014.03.017.
+[5] Li, S., & Wang, S. (2014). A financial early warning logit model and its efficiency verification approach. Knowledge-Based Systems, 70, 78–87. https://doi.org/10.1016/j.knosys.2014.03.017
 
-[6] G. Perboli, E. Arabnezhad, A machine learning-based DSS for mid and long-term company crisis prediction, Expert Systems with Applications 174 (2021) 114758. https://doi.org/10.1016/j.eswa.2021.114758.
+[6] Perboli, G., & Arabnezhad, E. (2021). A machine learning-based DSS for mid and long-term company crisis prediction. Expert Systems with Applications, 174, 114758. https://doi.org/10.1016/j.eswa.2021.114758
 
-[7] G. Vial, Understanding digital transformation: A review and a research agenda, The Journal of Strategic Information Systems 28 (2019) 118–144. https://doi.org/10.1016/j.jsis.2019.01.003.
+[7] Vial, G. (2019). Understanding digital transformation: A review and a research agenda. The Journal of Strategic Information Systems, 28(2), 118–144. https://doi.org/10.1016/j.jsis.2019.01.003
 
-[8] K.S.R. Warner, M. Wäger, Building dynamic capabilities for digital transformation: An ongoing process of strategic renewal, Long Range Planning 52 (2019) 326–349. https://doi.org/10.1016/j.lrp.2018.12.001.
+[8] Warner, K. S. R., & Wäger, M. (2019). Building dynamic capabilities for digital transformation: An ongoing process of strategic renewal. Long Range Planning, 52(3), 326–349. https://doi.org/10.1016/j.lrp.2018.12.001
 
-[9] P.C. Verhoef, T. Broekhuizen, Y. Bart, A. Bhattacharya, J.Q. Dong, N. Fabian, M. Haenlein, Digital transformation: A multidisciplinary reflection and research agenda, Journal of Business Research 122 (2021) 889–901. https://doi.org/10.1016/j.jbusres.2019.09.022.
+[9] Verhoef, P. C., Broekhuizen, T., Bart, Y., Bhattacharya, A., Dong, J. Q., Fabian, N., & Haenlein, M. (2021). Digital transformation: A multidisciplinary reflection and research agenda. Journal of Business Research, 122, 889–901. https://doi.org/10.1016/j.jbusres.2019.09.022
 
-[10] S. Kraus, S. Durst, J.J. Ferreira, P. Veiga, N. Kailer, A. Weinmann, Digital transformation in business and management research: An overview of the current status quo, International Journal of Information Management 63 (2022) 102466. https://doi.org/10.1016/j.ijinfomgt.2021.102466.
+[10] Kraus, S., Durst, S., Ferreira, J. J., Veiga, P., Kailer, N., & Weinmann, A. (2022). Digital transformation in business and management research: An overview of the current status quo. International Journal of Information Management, 63, 102466. https://doi.org/10.1016/j.ijinfomgt.2021.102466
 
-[11] S. Nambisan, Digital entrepreneurship: Toward a digital technology perspective of entrepreneurship, Entrepreneurship Theory and Practice 41 (2017) 1029–1055. https://doi.org/10.1111/etap.12254.
+[11] Nambisan, S. (2017). Digital entrepreneurship: Toward a digital technology perspective of entrepreneurship. Entrepreneurship Theory and Practice, 41(6), 1029–1055. https://doi.org/10.1111/etap.12254
 
-[12] S. Nambisan, M. Wright, M. Feldman, The digital transformation of innovation and entrepreneurship: Progress, challenges and key themes, Research Policy 48 (2019) 103773. https://doi.org/10.1016/j.respol.2019.03.018.
+[12] Nambisan, S., Wright, M., & Feldman, M. (2019). The digital transformation of innovation and entrepreneurship: Progress, challenges and key themes. Research Policy, 48(8), 103773. https://doi.org/10.1016/j.respol.2019.03.018
 
-[13] D.J. Teece, Explicating dynamic capabilities: The nature and microfoundations of (sustainable) enterprise performance, Strategic Management Journal 28 (2007) 1319–1350. https://doi.org/10.1002/smj.640.
+[13] Teece, D. J. (2007). Explicating dynamic capabilities: The nature and microfoundations of (sustainable) enterprise performance. Strategic Management Journal, 28(13), 1319–1350. https://doi.org/10.1002/smj.640
 
-[14] R. Rupeika-Apoga, K. Petrovska, L. Bule, The effect of digital orientation and digital capability on digital transformation of SMEs during the COVID-19 pandemic, Journal of Theoretical and Applied Electronic Commerce Research 17 (2022) 669–685. https://doi.org/10.3390/jtaer17020035.
+[14] Rupeika-Apoga, R., Petrovska, K., & Bule, L. (2022). The effect of digital orientation and digital capability on digital transformation of SMEs during the COVID-19 pandemic. Journal of Theoretical and Applied Electronic Commerce Research, 17(2), 669–685. https://doi.org/10.3390/jtaer17020035
 
-[15] M. Christofi, H. Khan, N. Zahoor, E. Hadjielias, S. Tarba, Digital transformation of SMEs: The role of entrepreneurial persistence and market sensing dynamic capability, IEEE Transactions on Engineering Management 71 (2024) 13598–13615. https://doi.org/10.1109/TEM.2022.3230248.
+[15] Christofi, M., Khan, H., Zahoor, N., Hadjielias, E., & Tarba, S. (2024). Digital transformation of SMEs: The role of entrepreneurial persistence and market sensing dynamic capability. IEEE Transactions on Engineering Management, 71, 13598–13615. https://doi.org/10.1109/TEM.2022.3230248
 
-[16] H. Wang, W. Wu, The effects of digital technology strategy configurations on new venture performance, IEEE Transactions on Engineering Management 71 (2024) 5470–5486. https://doi.org/10.1109/TEM.2024.3363625.
+[16] Wang, H., & Wu, W. (2024). The effects of digital technology strategy configurations on new venture performance. IEEE Transactions on Engineering Management, 71, 5470–5486. https://doi.org/10.1109/TEM.2024.3363625
 
-[17] V. Kumar, S. Kumar, S. Chatterjee, M. Mariani, Optimizing the digital transformation capability for enhancing economic sustainability of entrepreneurial venture: The moderating role of entrepreneurial orientation, IEEE Transactions on Engineering Management 71 (2024) 8517–8530. https://doi.org/10.1109/TEM.2024.3387540.
+[17] Kumar, V., Kumar, S., Chatterjee, S., & Mariani, M. (2024). Optimizing the digital transformation capability for enhancing economic sustainability of entrepreneurial venture: The moderating role of entrepreneurial orientation. IEEE Transactions on Engineering Management, 71, 8517–8530. https://doi.org/10.1109/TEM.2024.3387540
 
-[18] P. Gao, W. Wu, Y. Yang, Discovering themes and trends in digital transformation and innovation research, Journal of Theoretical and Applied Electronic Commerce Research 17 (2022) 1162–1184. https://doi.org/10.3390/jtaer17030059.
+[18] Gao, P., Wu, W., & Yang, Y. (2022). Discovering themes and trends in digital transformation and innovation research. Journal of Theoretical and Applied Electronic Commerce Research, 17(3), 1162–1184. https://doi.org/10.3390/jtaer17030059
 
-[19] H. Chen, R.H.L. Chiang, V.C. Storey, Business intelligence and analytics: From big data to big impact, MIS Quarterly 36 (2012) 1165–1188. https://doi.org/10.2307/41703503.
+[19] Chen, H., Chiang, R. H. L., & Storey, V. C. (2012). Business intelligence and analytics: From big data to big impact. MIS Quarterly, 36(4), 1165–1188. https://doi.org/10.2307/41703503
 
-[20] E.H. Shortliffe, B.G. Buchanan, A model of inexact reasoning in medicine, Mathematical Biosciences 23 (1975) 351–379. https://doi.org/10.1016/0025-5564(75)90047-4.
+[20] Shortliffe, E. H., & Buchanan, B. G. (1975). A model of inexact reasoning in medicine. Mathematical Biosciences, 23(3–4), 351–379. https://doi.org/10.1016/0025-5564(75)90047-4
 
-[21] T. Hosaka, Bankruptcy prediction using imaged financial ratios and convolutional neural networks, Expert Systems with Applications 117 (2019) 287–299. https://doi.org/10.1016/j.eswa.2018.09.039.
+[21] Hosaka, T. (2019). Bankruptcy prediction using imaged financial ratios and convolutional neural networks. Expert Systems with Applications, 117, 287–299. https://doi.org/10.1016/j.eswa.2018.09.039
 
-[22] F. Mai, S. Tian, C. Lee, L. Ma, Deep learning models for bankruptcy prediction using textual disclosures, European Journal of Operational Research 274 (2019) 743–758. https://doi.org/10.1016/j.ejor.2018.10.024.
+[22] Mai, F., Tian, S., Lee, C., & Ma, L. (2019). Deep learning models for bankruptcy prediction using textual disclosures. European Journal of Operational Research, 274(2), 743–758. https://doi.org/10.1016/j.ejor.2018.10.024
 
-[23] D. Liang, C.-F. Tsai, H.-T. Wu, The effect of feature selection on financial distress prediction, Knowledge-Based Systems 73 (2015) 289–297. https://doi.org/10.1016/j.knosys.2014.10.010.
+[23] Liang, D., Tsai, C.-F., & Wu, H.-T. (2015). The effect of feature selection on financial distress prediction. Knowledge-Based Systems, 73, 289–297. https://doi.org/10.1016/j.knosys.2014.10.010
 
-[24] J.H. Friedman, Greedy function approximation: A gradient boosting machine, The Annals of Statistics 29 (2001) 1189–1232. https://doi.org/10.1214/aos/1013203451.
+[24] Friedman, J. H. (2001). Greedy function approximation: A gradient boosting machine. The Annals of Statistics, 29(5), 1189–1232. https://doi.org/10.1214/aos/1013203451
 
-[25] F. Wilcoxon, Individual comparisons by ranking methods, Biometrics Bulletin 1 (1945) 80–83. https://doi.org/10.2307/3001968.
+[25] Wilcoxon, F. (1945). Individual comparisons by ranking methods. Biometrics Bulletin, 1(6), 80–83. https://doi.org/10.2307/3001968
 
-[26] H. Li, J. Sun, Ranking-order case-based reasoning for financial distress prediction, Knowledge-Based Systems 21 (2008) 868–878. https://doi.org/10.1016/j.knosys.2008.03.047.
+[26] Li, H., & Sun, J. (2008). Ranking-order case-based reasoning for financial distress prediction. Knowledge-Based Systems, 21(8), 868–878. https://doi.org/10.1016/j.knosys.2008.03.047
+:::
