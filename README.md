@@ -1,8 +1,8 @@
-# Knowledge-based early warning for digital-venture failure
+# KG-EWS: knowledge-guided early warning for digital-venture failure
 
-Short communication and the code that produces its figures, tables, and numbers.
+Short communication and the program that produces its cohorts, figures, tables, and tests.
 
-The study asks whether a knowledge base of entrepreneurial and digital-transformation rules, an artificial-intelligence model, or a mixture of the two is the right warning score for failure among digital ventures. The manuscript is `PAPER.md`. Every reported metric comes from `ews.py`.
+KG-EWS adds eight committee rules to the log-odds of a logistic score. The rules cover capability, innovation, team, runway, and traction in an entrepreneurial firm that is trying to transform digitally. The benchmark is synthetic and seeded. Every number in `PAPER.md` comes from `ews.py`.
 
 ## Run
 
@@ -10,22 +10,22 @@ The study asks whether a knowledge base of entrepreneurial and digital-transform
 python ews.py
 ```
 
-That rewrites `fig1_architecture.png`, `fig2_roc.png`, and `results.json`. The random seed is 42. No network connection is required.
+The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`, and `results.json`. Cohort seeds are 9000 through 9119. No network connection and no external data file are required.
 
 ## Files
 
 | File | Role |
 | --- | --- |
-| `ews.py` | Rules, models, cross-validation, figures |
-| `venture_data.csv` | 472 public venture profiles, company names removed |
-| `PAPER.md` | Short communication with two figures and two tables |
-| `fig1_architecture.png` | System diagram |
-| `fig2_roc.png` | Out-of-fold ROC curves |
+| `ews.py` | Generator, rules, models, paired tests, figures |
+| `PAPER.md` | Short communication: two figures and two tables |
+| `fig1_architecture.png` | Warning card and one rule-triggered test case |
+| `fig2_results.png` | Decision cost and the false-alarm tradeoff |
+| `cohort_results.csv` | One row per cohort, the source of both tables |
 
-## Data
+## What the experiment claims
 
-`venture_data.csv` is a column subset of the public CAX startup table (`CAX_Startup_Data.csv`), with company names dropped. The analysis keeps the 452 firms whose product is digital: machine learning, predictive or prescriptive or speech analytics, big data, or a cloud or platform offer. The label is the public company status, failed versus success. It is not a privately collected field sample, and it has no failure date.
+On 120 cohorts, KG-EWS has the lowest decision cost and the highest AUC among logistic regression, gradient boosting, the rules alone, and the combined score. The rules alone alarm on most surviving firms. The gain over logistic regression is small and paired. The data are not a field sample and there is no failure date.
 
 ## Manuscript note
 
-Add author names and affiliations before submission. Knowledge-Based Systems limits a short communication to 10 double-spaced pages, including tables and figures. The warning score in this study is the gradient-boosting probability. The rules explain the warning. The mixture of the two probabilities does not improve discrimination on this cohort, and the paper says so.
+Add author names before submission. Knowledge-Based Systems limits a short communication to 10 double-spaced pages, including tables and figures.
