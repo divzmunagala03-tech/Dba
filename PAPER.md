@@ -6,8 +6,6 @@
 
 ## Highlights
 
-Upload this block as a separate file named highlights. Each line is at most 85 characters.
-
 - KG-EWS adds committee-rule evidence to a logistic warning score.
 - Validation sets the evidence weight from a five-to-one miss cost.
 - Across 120 cohorts the paired cost gain over logistic regression is 0.024.
@@ -90,7 +88,7 @@ Figure 1a is this card. Figure 1b is one test venture on which the card changes 
 
 ![Figure 1. (a) KG-EWS adds committee-rule evidence to a logistic score. (b) A test venture whose rules fire. The measured-field models score it near 0.12 and 0.02. KG-EWS scores it near 1.00.](fig1_architecture.png)
 
-**Figure 1.** (a) The warning card. Committee rules are coded on the operational state. The logistic score uses noisy measurements. (b) One rule-triggered test failure. R1, R2, R3, and R7 fire. Logistic probability 0.118, gradient boosting 0.016, rules alone 0.971, KG-EWS 0.999. The figure is program output, not a generated illustration of data.
+**Figure 1.** (a) The warning card. Committee rules are coded on the operational state. The logistic score uses noisy measurements. (b) One rule-triggered test failure. R1, R2, R3, and R7 fire. Logistic probability 0.118, gradient boosting 0.016, rules alone 0.971, KG-EWS 0.999.
 
 ## 3. Experimental design
 
@@ -123,13 +121,13 @@ Table 1 is the mean across 120 test slices. The 95% interval for the mean cost i
 
 ![Figure 2. (a) Paired cost reduction of KG-EWS against each baseline. The 95% interval for logistic regression lies above zero. (b) The knowledge base misses few rule-triggered failures only because it alarms on 92% of surviving firms.](fig2_results.png)
 
-**Figure 2.** (a) Mean paired reduction in decision cost, baseline minus KG-EWS, with a 95% t interval across 120 cohorts. A bar above the zero line favors KG-EWS. (b) Missed rule-triggered failures and false alarms among surviving firms, at the validation threshold. Both panels are drawn by `ews.py` from the cohort table.
+**Figure 2.** (a) Mean paired reduction in decision cost, baseline minus KG-EWS, with a 95% t interval across 120 cohorts. A bar above the zero line favors KG-EWS. (b) Missed rule-triggered failures and false alarms among surviving firms, at the validation threshold.
 
-KG-EWS is the only score that leads both columns a decision maker would optimize together. Mean AUC is 0.765 against 0.743 for logistic regression, 0.696 for gradient boosting, and 0.645 for the rules alone. Mean cost is 0.598 against 0.622, 0.675, and 0.633. The comparison that supports the small gap is the paired one in Figure 2a and Table 2. The logistic bar is the short one, and its interval still clears zero.
+KG-EWS is the only score in Table 1 that leads on both AUC and decision cost. The separate 95% intervals for mean cost nearly touch, so the claim rests on the paired comparison in Figure 2a and Table 2. The logistic interval in Figure 2a lies above zero.
 
-The knowledge base is not a competing operating point. Case-based reasoning has already been used for financial-distress prediction in this knowledge-based line [26]. The rule-miss rate of the knowledge base in Table 1 is 0.004, which looks decisive in isolation and is not. The cost-minimizing threshold on that score alarms on 92.2% of surviving firms. A rule probability that does not separate the middle of the cohort is pushed, by the 5:1 cost, toward warning on almost everyone. That is why the rules enter Eq. (3) as evidence on top of a measured-field score. The same point applies to an early-warning logit used as the only score [5]: a high catch rate is not a usable policy when almost every survivor is also alerted.
+The knowledge base is not a competing operating point. Case-based reasoning has already been used for financial-distress prediction in this knowledge-based line [26]. The rule-miss rate of the knowledge base in Table 1 is 0.004, which looks decisive in isolation and is not. The cost-minimizing threshold on that score alarms on 92.2% of surviving firms. A rule probability that does not separate the middle of the cohort is pushed, by the 5:1 cost, toward warning on almost everyone. That is why the rules enter Eq. (3) as evidence on top of a measured-field score, rather than as the sole probability, which is the role of a financial early-warning logit [5].
 
-Gradient boosting does not recover the committee rules from the noisy measurements. Its AUC is 0.048 below the logistic score and 0.069 below KG-EWS, and its cost is the worst of the four. Depth-three trees are a poor instrument for a mostly additive measurement model observed with noise. The interactions that matter are already written as rules. Deeper image and text models can separate bankrupt firms in other settings [21,22]. They are not the baseline required to test whether these eight rules add evidence the noisy fields do not carry.
+Gradient boosting does not recover the committee rules from the noisy measurements. Its AUC is 0.047 below the logistic score and 0.069 below KG-EWS, and its cost is the worst of the four. Depth-three trees are a poor instrument for a mostly additive measurement model observed with noise. The interactions that matter are already written as rules. Deeper image and text models can separate bankrupt firms in other settings [21,22]. They are not the baseline required to test whether these eight rules add evidence the noisy fields do not carry.
 
 The trade inside KG-EWS is visible in Table 1 and should not be smoothed over. Relative to logistic regression, rule-miss falls from 0.118 to 0.067 and the false-alarm rate falls from 0.614 to 0.536, while smooth-miss rises from 0.137 to 0.194. Shifting the log-odds toward firms that fire R1–R7 spends some of the alert budget on conjunctions and away from failures that have no rule. Eq. (1) says that exchange is worth making under the stated preference: the net cost falls. A user who cares only about smooth financial stress would keep λ at 0. The validation rule does that when the evidence does not earn its keep. λ was positive in 90 of the 120 cohorts. The mean λ was 0.78 (SD 0.81).
 
@@ -170,7 +168,7 @@ KG-EWS is a warning card for digital-transformation failure in entrepreneurial f
 
 ## Data availability
 
-The cohorts are synthetic. `ews.py` generates the ventures, fits every model, chooses λ and τ, repeats that choice at miss weights 3 and 8, runs the 60-cohort predicate-flip check, writes `cohort_results.csv`, and redraws both figures. The primary seeds are 9000 through 9119. The stress seeds are 12000 through 12059. The program and the cohort table are in the public repository https://github.com/divzmunagala03-tech/Dba. No external data file is required. A repository address is not an archived dataset DOI.
+The cohorts are synthetic. `ews.py` generates the ventures, fits every model, chooses λ and τ, repeats that choice at miss weights 3 and 8, runs the 60-cohort predicate-flip check, writes `cohort_results.csv`, and redraws both figures. The primary seeds are 9000 through 9119. The stress seeds are 12000 through 12059. The program and the cohort table are in the public repository https://github.com/divzmunagala03-tech/Dba. No external data file is required.
 
 ## Declaration of competing interest
 
