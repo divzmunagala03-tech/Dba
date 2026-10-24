@@ -1,0 +1,22 @@
+Journal submission proof: PENDING
+
+A genuine Elsevier confirmation screenshot is not in this project.
+
+On 24 October 2026 the upload step at
+https://submit.elsevier.com/KNOSYS/3a6cc6f3-6bb7-4d0d-ad8b-07be61ce1fdc/steps/submission-files-upload
+was opened from this workspace. Elsevier returned the Knowledge-Based Systems start page because the session was signed out. No file was uploaded. No confirmation page was shown. A screenshot of that start page is not proof of submission, and none has been placed here.
+
+This requirement is not complete.
+
+Before the assignment is treated as ready, do all of the following:
+
+1. Open the official Elsevier submission portal while signed in to the Elsevier account that owns the draft:
+   https://submit.elsevier.com/KNOSYS/submissions
+2. Upload the journal manuscript files: manuscript.docx, Declaration-of-competing-interests.docx, and Highlights.docx. Upload fig1_results.png if the form asks for the figure separately.
+3. Complete every journal submission step, including affiliation, full postal address, and corresponding-author e-mail.
+4. Review the submission and confirm it. The confirmation must come from Elsevier, after the final submit action.
+5. Capture the genuine confirmation screen.
+6. The screenshot must show the journal name Knowledge-Based Systems, the manuscript title or submission ID, and a submitted status.
+7. Save that screenshot in this folder, 06_Journal_Submission_Proof/, before submitting the assignment to the professor.
+
+Do not use a draft page, a start page, or an edited image as the proof.

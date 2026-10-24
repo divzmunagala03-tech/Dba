@@ -1,0 +1,16 @@
+Elsevier graphical abstract specification
+
+File: Graphical_Abstract.png and Graphical_Abstract.pdf
+Pixel size: 2656 × 1062
+Elsevier minimum: 1328 × 531 pixels (width × height). This file is exactly twice that minimum, so the ratio is 500:200.
+Resolution: 300 dpi.
+The image does not contain the heading "graphical abstract".
+
+Every number in the image is a three-decimal manuscript figure:
+- KG-EWS mean AUC 0.765
+- KG-EWS mean decision cost 0.598
+- Paired cost advantage versus logistic regression 0.024
+- Decision cost J = (5 × missed failures + false alarms) / firms
+- The paired gain is lost when each predicate is flipped with probability 0.15
+
+The image was drawn for this professor package. It is not embedded in the 10-page manuscript.

@@ -1,0 +1,12 @@
+Author and file note
+
+This Word file and this PDF are byte copies of the finalized Knowledge-Based Systems manuscript in the research repository (manuscript.docx and manuscript.pdf). They were not rewritten for the course.
+
+Manuscript author: Divya Munagala
+Course name supplied for DBA 802: Divya
+Student ID: not supplied, and not invented
+Package folder name: DBA802_Hemasri_Babburu_Final_Assignment
+
+No university cover page was added. The assignment instructions say to add a cover page only if they permit one, and they say not to change the journal manuscript for cover-page conventions.
+
+The manuscript is a short communication. The literature, the research gap, the decision claim, the limits, and the conclusion are in sections 1 through 6. There is no separate heading titled Literature review, Research objectives, or Managerial implications.
