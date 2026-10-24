@@ -1,16 +1,16 @@
 # A knowledge-guided early-warning system for digital-transformation failure in entrepreneurial firms
 
 ::: {.frontmatter}
-Short Communication
-
-Divya Munagala, corresponding author
+Divya Munagala
 :::
 
 ## Abstract
 
 Digital-transformation failure in an entrepreneurial firm is a decision, not only a rank. The warning has to catch a conjunction a committee can name, and the alert has to be chosen by a stated cost. This short communication presents KG-EWS, a knowledge-guided early-warning score. Eight committee rules turn the operational state into a signed evidence term and add it to the log-odds of a logistic score fit on noisy measurements. The evidence weight and the alert threshold are chosen on a validation slice to minimize a decision cost that charges a missed failure five times a false alarm. Across 120 reproducible cohorts of 380 ventures, KG-EWS reached a mean AUC of 0.765 and a mean decision cost of 0.598. Paired Wilcoxon tests favor it over logistic regression (cost advantage 0.024, 95% CI 0.008 to 0.040, p = 1.14×10⁻³; AUC advantage 0.022, p = 1.24×10⁻¹⁴), over gradient boosting, and over the rules used alone. KG-EWS is cheaper in 59 cohorts, more expensive in 28, and identical in 33. The gain remains when a missed failure is charged three times a false alarm, and it is not detectable when the charge is eight. It does not survive a coding error that flips each predicate with probability 0.15. Used alone, the rules catch rule-triggered failures only by alarming on 92.2% of surviving firms, so the issued warning is the combined score and the names of the rules that fired. The benchmark is synthetic and does not establish a calendar lead time.
 
-**Keywords:** knowledge-based system; early warning; digital transformation; entrepreneurship; innovation; decision cost; venture data
+## Keywords
+
+knowledge-based system; early warning; digital transformation; entrepreneurship; innovation; decision cost; venture data
 
 ## 1. Introduction
 
@@ -145,7 +145,7 @@ The cohorts are synthetic. `ews.py` generates the ventures, fits the models, cho
 
 ## Declaration of Competing Interest
 
-The author declares that there are no known competing financial interests or personal relationships that could have appeared to influence the work reported in this manuscript.
+The author declares that there are no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
 
 ## Declaration of generative AI and AI-assisted technologies in the manuscript preparation process
 
