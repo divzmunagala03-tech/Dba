@@ -1,16 +1,16 @@
 # A knowledge-guided early-warning system for digital-transformation failure in entrepreneurial firms
 
 ::: {.frontmatter}
+Short Communication
+
 Divya Munagala
 :::
 
-## Abstract
+Abstract
 
 Digital-transformation failure in an entrepreneurial firm is a decision, not only a rank. The warning has to catch a conjunction a committee can name, and the alert has to be chosen by a stated cost. This short communication presents KG-EWS, a knowledge-guided early-warning score. Eight committee rules turn the operational state into a signed evidence term and add it to the log-odds of a logistic score fit on noisy measurements. The evidence weight and the alert threshold are chosen on a validation slice to minimize a decision cost that charges a missed failure five times a false alarm. Across 120 reproducible cohorts of 380 ventures, KG-EWS reached a mean AUC of 0.765 and a mean decision cost of 0.598. Paired Wilcoxon tests favor it over logistic regression (cost advantage 0.024, 95% CI 0.008 to 0.040, p = 1.14×10⁻³; AUC advantage 0.022, p = 1.24×10⁻¹⁴), over gradient boosting, and over the rules used alone. KG-EWS is cheaper in 59 cohorts, more expensive in 28, and identical in 33. The gain remains when a missed failure is charged three times a false alarm, and it is not detectable when the charge is eight. It does not survive a coding error that flips each predicate with probability 0.15. Used alone, the rules catch rule-triggered failures only by alarming on 92.2% of surviving firms, so the issued warning is the combined score and the names of the rules that fired. The benchmark is synthetic and does not establish a calendar lead time.
 
-## Keywords
-
-knowledge-based system; early warning; digital transformation; entrepreneurship; innovation; decision cost; venture data
+Keywords: knowledge-based system; early warning; digital transformation; entrepreneurship; innovation; decision cost; venture data
 
 ## 1. Introduction
 
@@ -65,7 +65,7 @@ s = σ( logit(p_Lin) + λ e ), (3)
 
 where σ is the logistic function and λ ≥ 0 is chosen from the grid {0, 0.2, …, 3.0} to minimize validation J. The alert threshold τ is then chosen on that same slice. If the rules do not help, the minimum is at λ = 0 and Eq. (3) returns the logistic score. Gradient boosting [24] on the same noisy measurements is a baseline. The experiment asks whether measurement noise is enough to make the explicit rules worth adding.
 
-**Algorithm 1. KG-EWS**
+Algorithm 1. KG-EWS
 
 Input: noisy measurements x; committee predicates z; fit, validation, and test index sets. Output: test scores s and an alert threshold τ.
 
@@ -98,13 +98,13 @@ Table 1 is the mean across 120 test slices. The 95% interval for the mean cost i
 | Gradient boosting | 0.696 | 0.675 | 0.117 | 0.142 | 0.687 |
 | KG-EWS | 0.765 | 0.598 | 0.067 | 0.194 | 0.536 |
 
-: **Table 1.** Mean test-slice performance over 120 cohorts.
+: Table 1. Mean test-slice performance over 120 cohorts.
 
 Decision cost is Eq. (1). Rule-miss is the share of rule-triggered failures with no alert. Smooth-miss is the share of other failures with no alert. The false-alarm rate is among surviving firms. Lower is better for cost, miss rates, and false alarms. Higher is better for AUC.
 
 ![](fig1_results.png)
 
-**Figure 1.** Paired reduction in decision cost, baseline minus KG-EWS, plotted for each of 120 cohorts. The larger marker is the mean, with a 95% t interval. A point above the zero line favors KG-EWS.
+Figure 1. Paired reduction in decision cost, baseline minus KG-EWS, plotted for each of 120 cohorts. The larger marker is the mean, with a 95% t interval. A point above the zero line favors KG-EWS.
 
 KG-EWS is the only row in Table 1 that leads on both AUC and cost. Because the mean-cost intervals nearly touch, the claim is the paired comparison in Figure 1 and Table 2. The interval against logistic regression lies above zero. Logistic regression already fits the additive part of Eq. (4). The 0.024 cost reduction is the gain from the conjunctions that measurement noise obscures. The reductions of 0.035 and 0.077 are mostly gaps against a weaker instrument.
 
@@ -121,7 +121,7 @@ Removing the measured model moves cost from 0.598 to 0.633 and AUC from 0.765 to
 | Versus knowledge base | Decision cost | 0.035 | 0.017 to 0.054 | 81 / 35 / 4 | 2.91×10⁻⁵ |
 | Versus knowledge base | AUC | 0.121 | 0.112 to 0.130 | 119 / 1 / 0 | 2.37×10⁻²¹ |
 
-: **Table 2.** Paired comparisons on the 120 cohort-level test results.
+: Table 2. Paired comparisons on the 120 cohort-level test results.
 
 The advantage is baseline cost minus KG-EWS cost, or KG-EWS AUC minus baseline AUC. The p-value is a one-sided Wilcoxon signed-rank test [25]. Of the 33 logistic cost ties, 30 set λ to 0. Of the 90 cohorts with λ > 0, KG-EWS was cheaper in 59, more expensive in 28, and tied in 3. Mean gaps were 0.086 and −0.080. AUC then rises in 84 of those 90 cohorts and falls in 6.
 

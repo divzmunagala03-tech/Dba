@@ -65,4 +65,4 @@ The new-submission form is [submit.elsevier.com/KNOSYS/submissions](https://subm
 
 After the confirmation message, register for Editorial Manager with the same e-mail address. Revisions are handled there.
 
-The double-spaced manuscript is 10 letter pages, including the tables and the figure. The reference list is set compactly so the 29 sources fit that cap.
+The manuscript is set in Times New Roman on letter paper, double-spaced, with a centered title, the article type, and the author name. It is 12 pages, including the tables, the figure, and a double-spaced reference list. Knowledge-Based Systems asks a short communication to stay within 10 double-spaced pages, so the reference list can be tightened again before upload if the journal requires that cap.
