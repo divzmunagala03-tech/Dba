@@ -46,4 +46,4 @@ Knowledge-Based Systems asks for highlights as a separate editable file whose na
 
 ## Manuscript note
 
-The formatted manuscript follows the short-communication layout of the reference document: title, article type, author, abstract, keywords, numbered sections, table notes, figure captions, declarations, and author-year references. Affiliation, e-mail, and full postal address are still required before submission. Knowledge-Based Systems limits a short communication to 10 double-spaced pages, including tables and figures.
+Upload `manuscript.docx` as the manuscript. Knowledge-Based Systems does not accept a PDF as the source file. Upload `fig1_results.png` as the figure file and `highlights.txt` as the highlights file. Choose the article type Short Communication. The double-spaced manuscript is 10 letter pages, including the tables and the figure. The reference list is set compactly so the 29 sources fit that cap. Before upload, add the affiliation, the full postal address, and the corresponding-author e-mail on the title page and in the submission form.
