@@ -27,7 +27,7 @@ The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`
 | `manuscript.pdf` | The same manuscript as a PDF |
 | `manuscript.docx` | The same manuscript as a Word file |
 | `highlights.txt` | Separate highlights file for journal upload |
-| `fig1_architecture.png` | Warning card and one rule-triggered test case |
+| `fig1_architecture.png` | Rule-evidence graph for one test failure |
 | `fig2_results.png` | Paired cost advantage and the false-alarm tradeoff |
 | `cohort_results.csv` | Primary cohorts and the predicate-flip cohorts |
 

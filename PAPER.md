@@ -84,11 +84,11 @@ Output: test scores s and an alert threshold τ
 5. Freeze that λ and its τ.
 6. Return s and the alerts on the test slice, together with the identities of the rules that fired.
 
-Figure 1a is this card. Figure 1b is one test venture on which the card changes the warning.
+Figure 1 is one test venture on which the score changes the warning.
 
 ![](fig1_architecture.png)
 
-**Figure 1.** (a) The warning card. Committee rules are coded on the operational state. The logistic score uses noisy measurements. (b) One rule-triggered test failure. R1, R2, R3, and R7 fire. Logistic probability 0.118, gradient boosting 0.016, rules alone 0.971, KG-EWS 0.999.
+**Figure 1.** One rule-triggered test failure. R1, R2, R3, and R7 fire. Logistic probability 0.118, gradient boosting 0.016, rules alone 0.971, KG-EWS 0.999.
 
 ## 3. Experimental Design
 
@@ -156,7 +156,7 @@ Bankruptcy models for listed firms have been ranked by the financial cost of fai
 
 The predicate check names the other boundary. On the 60 cohorts with corrupted antecedents, the paired cost advantage over logistic regression is −0.015 (95% CI −0.036 to 0.006, cheaper in 18 cohorts, more expensive in 24, tied in 18, p = 0.892). The AUC advantage is −0.004 (95% CI −0.012 to 0.004, p = 0.527). λ stays positive in 42 of the 60 cohorts, with mean 0.46, so the validation rule does not fully switch the evidence off. The corrupted rules alone fall to a mean AUC of 0.578 and a mean cost of 0.722. KG-EWS remains cheaper than that rule score by 0.082 (p = 1.19×10⁻⁴). Rule-miss under KG-EWS is 0.128, against 0.130 for logistic regression. The conjunctions stop paying for themselves when the antecedents are wrong with probability 0.15.
 
-Figure 1b is one test venture from the same protocol. It is the test case, among firms with λ > 0, with the largest lift of the KG-EWS probability over the logistic probability. R1, R2, R3, and R7 fire together: digital investment without capability, without innovation throughput, and without a digital team. Logistic regression scores the firm at 0.118 and gradient boosting at 0.016. The rule score is 0.971. KG-EWS scores it at 0.999. The card names the four rules. That is the decision-support content of the method. Studies of digital orientation, persistence, and venture strategy are the setting in which a committee would argue about capability and investment [14–17]. They do not produce this alert.
+Figure 1 is one test venture from the same protocol. It is the test case, among firms with λ > 0, with the largest lift of the KG-EWS probability over the logistic probability. R1, R2, R3, and R7 fire together: digital investment without capability, without innovation throughput, and without a digital team. Logistic regression scores the firm at 0.118 and gradient boosting at 0.016. The rule score is 0.971. KG-EWS scores it at 0.999. The card names the four rules. That is the decision-support content of the method. Studies of digital orientation, persistence, and venture strategy are the setting in which a committee would argue about capability and investment [14–17]. They do not produce this alert.
 
 For a founder or investor the practical reading is limited and specific. Under a 5:1 preference, and when the committee codes the antecedents correctly, the card lowers decision cost by a small paired amount and says which rules fired. It still alerts on about half of surviving firms, because that is what Eq. (1) buys. It is not a screen that stays quiet. It is not evidence that digital strategy, taken from survey studies [15–17], predicts failure in the field.
 

@@ -18,7 +18,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 from scipy import stats
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
@@ -349,40 +348,8 @@ def plot_architecture(path: Path, case: dict) -> None:
         "font.size": 9,
         "axes.edgecolor": "#292524",
     })
-    fig, axes = plt.subplots(1, 2, figsize=(11.4, 5.15), dpi=300, gridspec_kw={"width_ratios": [1.15, 1]})
+    fig, ax = plt.subplots(figsize=(6.6, 4.2), dpi=300)
     fig.patch.set_facecolor("white")
-    ax = axes[0]
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.axis("off")
-    ax.set_title("(a)  Warning card", loc="left", fontsize=11, pad=8, color="#1c1917")
-
-    def box(x, y, w, h, text, face, edge):
-        ax.add_patch(FancyBboxPatch(
-            (x, y), w, h,
-            boxstyle="round,pad=0.008,rounding_size=0.02",
-            facecolor=face, edgecolor=edge, linewidth=1.15,
-        ))
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=8.1, color="#1c1917", linespacing=1.35)
-
-    def arrow(x1, y1, x2, y2):
-        ax.add_patch(FancyArrowPatch(
-            (x1, y1), (x2, y2), arrowstyle="-|>", mutation_scale=11,
-            linewidth=1.0, color="#44403c",
-        ))
-
-    box(0.18, 0.84, 0.64, 0.12, "Entrepreneurial firm\nOperational state of a digital venture", "#f5f5f4", "#44403c")
-    box(0.04, 0.50, 0.42, 0.24, "Knowledge base\nEight committee rules\nEvidence  e = Σ cᵢ zᵢ\nCoded on the operational state", "#ccfbf1", "#0f766e")
-    box(0.54, 0.50, 0.42, 0.24, "Measured-field model\nLogistic score from noisy\nrunway, burn, market, and\ncapability measurements", "#dbeafe", "#1d4ed8")
-    box(0.16, 0.24, 0.68, 0.16, "KG-EWS score\ns = σ( logit pLin + λ e )\nλ and the alert threshold minimize\nthe validation decision cost", "#ffedd5", "#c2410c")
-    box(0.22, 0.05, 0.56, 0.11, "Early-warning card\nProbability and the rules that fired", "#ffe4e6", "#9f1239")
-    arrow(0.50, 0.84, 0.25, 0.74)
-    arrow(0.50, 0.84, 0.75, 0.74)
-    arrow(0.25, 0.50, 0.40, 0.40)
-    arrow(0.75, 0.50, 0.60, 0.40)
-    arrow(0.50, 0.24, 0.50, 0.16)
-
-    ax = axes[1]
     rules = case["rules"]
     labels = [item["id"] for item in rules]
     values = [item["evidence"] for item in rules]
@@ -397,11 +364,11 @@ def plot_architecture(path: Path, case: dict) -> None:
         f"Test probabilities:  logistic {case['p_lin']:.2f}   "
         f"boosting {case['p_ai']:.2f}   rules {case['p_kb']:.2f}   KG-EWS {case['p_kg']:.2f}"
     )
-    ax.set_title("(b)  A rule-triggered failure", loc="left", fontsize=11, pad=8, color="#1c1917")
+    ax.set_title("A rule-triggered failure", loc="left", fontsize=11, pad=8, color="#1c1917")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.grid(axis="x", color="#e7e5e4", zorder=0)
-    ax.set_xlim(0, max(values) * 1.08 if values else 1)
+    ax.set_xlim(0, max(values) * 1.18 if values else 1)
     fig.tight_layout()
     fig.savefig(path, bbox_inches="tight", facecolor="white")
     plt.close(fig)
