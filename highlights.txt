@@ -1,0 +1,5 @@
+KG-EWS adds committee-rule evidence to a logistic warning score.
+Validation sets the evidence weight from a five-to-one miss cost.
+Across 120 cohorts the paired cost gain over logistic regression is 0.024.
+That gain remains at a three-to-one cost and is lost if predicates are flipped.
+Rules alone catch failures by alarming on most surviving firms.

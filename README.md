@@ -26,6 +26,7 @@ The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`
 | `PAPER.md` | Manuscript source: two figures and two tables |
 | `manuscript.pdf` | The same manuscript as a PDF |
 | `manuscript.docx` | The same manuscript as a Word file |
+| `highlights.txt` | Separate highlights file for journal upload |
 | `fig1_architecture.png` | Warning card and one rule-triggered test case |
 | `fig2_results.png` | Paired cost advantage and the false-alarm tradeoff |
 | `cohort_results.csv` | Primary cohorts and the predicate-flip cohorts |
@@ -36,7 +37,7 @@ On 120 cohorts, KG-EWS has the lowest decision cost and the highest AUC among lo
 
 ## Highlights
 
-Knowledge-Based Systems asks for these as a separate file, not inside the manuscript. Each bullet is at most 85 characters.
+Knowledge-Based Systems asks for highlights as a separate editable file whose name contains “highlights.” That file is [highlights.txt](highlights.txt). Each bullet is at most 85 characters.
 
 - KG-EWS adds committee-rule evidence to a logistic warning score.
 - Validation sets the evidence weight from a five-to-one miss cost.
