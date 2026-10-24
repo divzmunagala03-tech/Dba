@@ -119,7 +119,7 @@ Decision cost is Eq. (1). Rule-miss is the share of rule-triggered failures with
 
 ![](fig1_results.png)
 
-**Figure 1.** Mean paired reduction in decision cost, baseline minus KG-EWS, with a 95% t interval across 120 cohorts. A bar above the zero line favors KG-EWS.
+**Figure 1.** Paired reduction in decision cost, baseline minus KG-EWS, plotted for each of 120 cohorts. The larger marker is the mean, with a 95% t interval. A point above the zero line favors KG-EWS.
 
 KG-EWS is the only score in Table 1 that leads on both AUC and decision cost. The claim rests on the paired comparison in Figure 1 and Table 2, because the separate intervals for mean cost nearly touch. The interval for the comparison with logistic regression lies above zero. That reduction of 0.024 is the gain the design was built to detect. Logistic regression already fits the additive part of Eq. (4). The rules add the conjunctions that measurement noise obscures. The larger reductions in Figure 1, 0.035 against the knowledge base and 0.077 against gradient boosting, are mostly gaps between a suitable instrument and a weaker one.
 

@@ -342,43 +342,62 @@ def summarize(frame: pd.DataFrame) -> dict:
     return summary
 
 
-def plot_results(path: Path, summary: dict) -> None:
-    """One results image: paired decision-cost advantage of KG-EWS."""
+def plot_results(path: Path, summary: dict, cohorts: pd.DataFrame | None = None) -> None:
+    """One results image: cohort-level paired cost advantage, plotted."""
+    if cohorts is None:
+        cohorts = pd.read_csv(ROOT / "cohort_results.csv")
+    if "block" in cohorts.columns:
+        cohorts = cohorts.loc[cohorts["block"] == "main"].copy()
+
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10})
-    fig, ax = plt.subplots(figsize=(6.4, 4.4), dpi=300)
+    fig, ax = plt.subplots(figsize=(6.6, 4.6), dpi=300)
     fig.patch.set_facecolor("white")
 
     order = ("Logistic regression", "Knowledge base", "Gradient boosting")
+    columns = ("lin_j", "kb_j", "ai_j")
     by_name = {row["comparison"]: row for row in summary["tests"] if row["metric"] == "objective"}
     rows = [by_name[f"KG-EWS vs {name}"] for name in order]
-    means = [row["mean_advantage"] for row in rows]
-    lows = [row["mean_advantage"] - row["ci95"][0] for row in rows]
-    highs = [row["ci95"][1] - row["mean_advantage"] for row in rows]
     colors = ["#78716c", "#0f766e", "#1d4ed8"]
     tick_labels = ["Versus\nlogistic regression", "Versus\nknowledge base", "Versus\ngradient boosting"]
+    rng = np.random.default_rng(0)
 
-    xpos = np.arange(len(rows))
     ax.axhline(0.0, color="#1c1917", linewidth=0.9, zorder=1)
-    ax.bar(xpos, means, color=colors, width=0.62, zorder=2)
-    ax.errorbar(xpos, means, yerr=[lows, highs], fmt="none", ecolor="#1c1917", elinewidth=1.0, capsize=3, zorder=3)
-    span = max(highs[i] + abs(means[i]) for i in range(len(means)))
-    for i, mean in enumerate(means):
-        ax.text(
-            i, mean + highs[i] + 0.012 * max(span, 0.05),
-            f"{mean:.3f}", ha="center", va="bottom", fontsize=9, color="#1c1917",
+    plotted = []
+    for i, (column, row, color) in enumerate(zip(columns, rows, colors)):
+        values = cohorts[column].to_numpy() - cohorts["kg_j"].to_numpy()
+        plotted.append(values)
+        jitter = rng.uniform(-0.16, 0.16, size=len(values))
+        ax.plot(
+            i + jitter, values, linestyle="none", marker="o",
+            markersize=3.4, color=color, alpha=0.38, markeredgewidth=0, zorder=2,
         )
-    ax.set_xticks(xpos)
+        mean = row["mean_advantage"]
+        low = mean - row["ci95"][0]
+        high = row["ci95"][1] - mean
+        ax.errorbar(
+            i, mean, yerr=[[low], [high]], fmt="o",
+            color="#1c1917", ecolor="#1c1917", elinewidth=1.15, capsize=4, markersize=8,
+            markerfacecolor=color, markeredgecolor="#1c1917", markeredgewidth=0.8, zorder=4,
+        )
+        ax.annotate(
+            f"{mean:.3f}", (i, mean + high), textcoords="offset points", xytext=(0, 6),
+            ha="center", va="bottom", fontsize=9, color="#1c1917",
+        )
+
+    ax.set_xticks(np.arange(len(order)))
     ax.set_xticklabels(tick_labels)
+    ax.set_xlim(-0.55, 2.55)
     ax.set_ylabel("Paired cost reduction per firm\n(baseline − KG-EWS)")
     ax.set_title("Paired cost advantage of KG-EWS", loc="left", fontsize=12, color="#1c1917")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.grid(axis="y", color="#e7e5e4", zorder=0)
     ax.set_axisbelow(True)
-    floor = min(0.0, min(means[i] - lows[i] for i in range(len(means))))
-    ceiling = max(means[i] + highs[i] for i in range(len(means)))
+    flat = np.concatenate(plotted)
+    floor = min(0.0, float(flat.min()))
+    ceiling = max(float(flat.max()), max(row["ci95"][1] for row in rows))
     pad = 0.08 * max(ceiling - floor, 0.05)
-    ax.set_ylim(floor - pad, ceiling + 3.2 * pad)
+    ax.set_ylim(floor - pad, ceiling + 2.4 * pad)
     fig.tight_layout()
     fig.savefig(path, bbox_inches="tight", facecolor="white")
     plt.close(fig)
@@ -447,7 +466,7 @@ def main() -> None:
     summary["miss_weight"] = MISS_WEIGHT
     summary["false_alarm_weight"] = FALSE_ALARM_WEIGHT
     (ROOT / "results.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    plot_results(ROOT / "fig1_results.png", summary)
+    plot_results(ROOT / "fig1_results.png", summary, frame)
     printable = {key: summary[key] for key in summary if key != "case"}
     printable["case"] = case
     print(json.dumps(printable, indent=2))

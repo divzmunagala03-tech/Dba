@@ -27,7 +27,7 @@ The run writes `fig1_results.png`, `cohort_results.csv`, and `results.json`. Pri
 | `manuscript.pdf` | The same manuscript as a PDF |
 | `manuscript.docx` | The same manuscript as a Word file |
 | `highlights.txt` | Separate highlights file for journal upload |
-| `fig1_results.png` | The one results image: paired cost advantage of KG-EWS |
+| `fig1_results.png` | The one results image: plotted paired cost advantage of KG-EWS |
 | `cohort_results.csv` | Primary cohorts and the predicate-flip cohorts |
 
 ## What the experiment claims
