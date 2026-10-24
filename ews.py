@@ -343,10 +343,9 @@ def summarize(frame: pd.DataFrame) -> dict:
 
 
 def plot_results(path: Path, summary: dict) -> None:
-    plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9})
-    methods = ["lin", "kb", "ai", "kg"]
-    labels = ["Logistic\nregression", "Knowledge\nbase", "Gradient\nboosting", "KG-EWS"]
-    fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.85), dpi=300)
+    """One results image: paired decision-cost advantage of KG-EWS."""
+    plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10})
+    fig, ax = plt.subplots(figsize=(6.4, 4.4), dpi=300)
     fig.patch.set_facecolor("white")
 
     order = ("Logistic regression", "Knowledge base", "Gradient boosting")
@@ -358,21 +357,20 @@ def plot_results(path: Path, summary: dict) -> None:
     colors = ["#78716c", "#0f766e", "#1d4ed8"]
     tick_labels = ["Versus\nlogistic regression", "Versus\nknowledge base", "Versus\ngradient boosting"]
 
-    ax = axes[0]
     xpos = np.arange(len(rows))
     ax.axhline(0.0, color="#1c1917", linewidth=0.9, zorder=1)
-    ax.bar(xpos, means, color=colors, width=0.68, zorder=2)
+    ax.bar(xpos, means, color=colors, width=0.62, zorder=2)
     ax.errorbar(xpos, means, yerr=[lows, highs], fmt="none", ecolor="#1c1917", elinewidth=1.0, capsize=3, zorder=3)
     span = max(highs[i] + abs(means[i]) for i in range(len(means)))
-    for i, row in enumerate(rows):
+    for i, mean in enumerate(means):
         ax.text(
-            i, means[i] + highs[i] + 0.012 * max(span, 0.05),
-            f"{means[i]:.3f}", ha="center", va="bottom", fontsize=8, color="#1c1917",
+            i, mean + highs[i] + 0.012 * max(span, 0.05),
+            f"{mean:.3f}", ha="center", va="bottom", fontsize=9, color="#1c1917",
         )
     ax.set_xticks(xpos)
     ax.set_xticklabels(tick_labels)
     ax.set_ylabel("Paired cost reduction per firm\n(baseline − KG-EWS)")
-    ax.set_title("(a)  Paired cost advantage of KG-EWS", loc="left", fontsize=11, color="#1c1917")
+    ax.set_title("Paired cost advantage of KG-EWS", loc="left", fontsize=12, color="#1c1917")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.grid(axis="y", color="#e7e5e4", zorder=0)
@@ -381,29 +379,7 @@ def plot_results(path: Path, summary: dict) -> None:
     ceiling = max(means[i] + highs[i] for i in range(len(means)))
     pad = 0.08 * max(ceiling - floor, 0.05)
     ax.set_ylim(floor - pad, ceiling + 3.2 * pad)
-
-    ax = axes[1]
-    width = 0.36
-    group = np.arange(len(methods))
-    miss_r = [summary[m]["miss_rule"]["mean"] for m in methods]
-    false_alarm = [summary[m]["false_alarm"]["mean"] for m in methods]
-    ax.bar(group - width / 2, miss_r, width=width, color="#9f1239", label="Missed rule-triggered failures", zorder=2)
-    ax.bar(group + width / 2, false_alarm, width=width, color="#57534e", label="False alarms among surviving firms", zorder=2)
-    ax.set_xticks(group)
-    ax.set_xticklabels(labels)
-    ax.set_ylim(0, 1.05)
-    ax.set_ylabel("Rate at the validation threshold")
-    ax.set_title("(b)  Rule misses against false alarms", loc="left", fontsize=11, color="#1c1917")
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.grid(axis="y", color="#e7e5e4", zorder=0)
-    ax.set_axisbelow(True)
-    ax.legend(
-        frameon=False, fontsize=8.0, loc="upper center",
-        bbox_to_anchor=(0.5, -0.22), ncol=1,
-    )
     fig.tight_layout()
-    fig.subplots_adjust(bottom=0.22)
     fig.savefig(path, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
