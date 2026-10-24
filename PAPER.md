@@ -84,12 +84,6 @@ Output: test scores s and an alert threshold τ
 5. Freeze that λ and its τ.
 6. Return s and the alerts on the test slice, together with the identities of the rules that fired.
 
-Figure 1 is one test venture on which the score changes the warning.
-
-![](fig1_architecture.png)
-
-**Figure 1.** One rule-triggered test failure. R1, R2, R3, and R7 fire. Logistic probability 0.118, gradient boosting 0.016, rules alone 0.971, KG-EWS 0.999.
-
 ## 3. Experimental Design
 
 The benchmark is synthetic and seeded. Every cohort can be regenerated from `ews.py` with cohort seed 9000 + k. There are 120 cohorts of 380 ventures. Each cohort is split into a fit slice (52.5%), a validation slice (17.5%), and a test slice (30%), stratified on the failure label. Models are fit once. λ and τ are chosen on the validation slice and frozen before the test slice is scored. Nothing in the reported means is computed on data that chose the weight or the threshold.
@@ -110,7 +104,7 @@ Two further checks are fixed in the program, not chosen after inspecting test co
 
 ## 4. Results and Discussion
 
-Table 1 is the mean across 120 test slices. The 95% interval for the mean cost is 0.579 to 0.617 for KG-EWS and 0.602 to 0.642 for logistic regression. Those two intervals nearly touch, so Figure 2a reports the paired difference inside each cohort rather than the two means side by side. Figure 2b is the trade that produces the cost: missed rule-triggered failures against false alarms among surviving firms.
+Table 1 is the mean across 120 test slices. The 95% interval for the mean cost is 0.579 to 0.617 for KG-EWS and 0.602 to 0.642 for logistic regression. Those two intervals nearly touch, so Figure 1a reports the paired difference inside each cohort rather than the two means side by side. Figure 1b is the trade that produces the cost: missed rule-triggered failures against false alarms among surviving firms.
 
 | Method | AUC | Decision cost | Rule-miss | Smooth-miss | False-alarm rate |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -123,11 +117,11 @@ Table 1 is the mean across 120 test slices. The 95% interval for the mean cost i
 
 Decision cost is Eq. (1). Rule-miss is the share of rule-triggered failures with no alert. Smooth-miss is the share of other failures with no alert. The false-alarm rate is among surviving firms. Lower is better for cost, miss rates, and false alarms. Higher is better for AUC.
 
-![](fig2_results.png)
+![](fig1_results.png)
 
-**Figure 2.** (a) Mean paired reduction in decision cost, baseline minus KG-EWS, with a 95% t interval across 120 cohorts. A bar above the zero line favors KG-EWS. (b) Missed rule-triggered failures and false alarms among surviving firms, at the validation threshold.
+**Figure 1.** (a) Mean paired reduction in decision cost, baseline minus KG-EWS, with a 95% t interval across 120 cohorts. A bar above the zero line favors KG-EWS. (b) Missed rule-triggered failures and false alarms among surviving firms, at the validation threshold.
 
-KG-EWS is the only score in Table 1 that leads on both AUC and decision cost. The separate 95% intervals for mean cost nearly touch, so the claim rests on the paired comparison in Figure 2a and Table 2. The logistic interval in Figure 2a lies above zero.
+KG-EWS is the only score in Table 1 that leads on both AUC and decision cost. The separate 95% intervals for mean cost nearly touch, so the claim rests on the paired comparison in Figure 1a and Table 2. The logistic interval in Figure 1a lies above zero.
 
 The knowledge base is not a competing operating point. Case-based reasoning has already been used for financial-distress prediction in this knowledge-based line [26]. Listed-company distress scores have also been merged with rough sets and Dempster–Shafer evidence, and that combination was reported to beat a single classifier [27]. KG-EWS does not fuse several statistical classifiers. It adds one block of committee-rule evidence to one logistic score. The rule-miss rate of the knowledge base in Table 1 is 0.004, which looks decisive in isolation and is not. The cost-minimizing threshold on that score alarms on 92.2% of surviving firms. A rule probability that does not separate the middle of the cohort is pushed, by the 5:1 cost, toward warning on almost everyone. That is why the rules enter Eq. (3) as evidence on top of a measured-field score, rather than as the sole probability, which is the role of a financial early-warning logit [5].
 
@@ -156,7 +150,7 @@ Bankruptcy models for listed firms have been ranked by the financial cost of fai
 
 The predicate check names the other boundary. On the 60 cohorts with corrupted antecedents, the paired cost advantage over logistic regression is −0.015 (95% CI −0.036 to 0.006, cheaper in 18 cohorts, more expensive in 24, tied in 18, p = 0.892). The AUC advantage is −0.004 (95% CI −0.012 to 0.004, p = 0.527). λ stays positive in 42 of the 60 cohorts, with mean 0.46, so the validation rule does not fully switch the evidence off. The corrupted rules alone fall to a mean AUC of 0.578 and a mean cost of 0.722. KG-EWS remains cheaper than that rule score by 0.082 (p = 1.19×10⁻⁴). Rule-miss under KG-EWS is 0.128, against 0.130 for logistic regression. The conjunctions stop paying for themselves when the antecedents are wrong with probability 0.15.
 
-Figure 1 is one test venture from the same protocol. It is the test case, among firms with λ > 0, with the largest lift of the KG-EWS probability over the logistic probability. R1, R2, R3, and R7 fire together: digital investment without capability, without innovation throughput, and without a digital team. Logistic regression scores the firm at 0.118 and gradient boosting at 0.016. The rule score is 0.971. KG-EWS scores it at 0.999. The card names the four rules. That is the decision-support content of the method. Studies of digital orientation, persistence, and venture strategy are the setting in which a committee would argue about capability and investment [14–17]. They do not produce this alert.
+One test venture from the same protocol is the case, among firms with λ > 0, with the largest lift of the KG-EWS probability over the logistic probability. R1, R2, R3, and R7 fire together: digital investment without capability, without innovation throughput, and without a digital team. Logistic regression scores the firm at 0.118 and gradient boosting at 0.016. The rule score is 0.971. KG-EWS scores it at 0.999. The card names the four rules. That is the decision-support content of the method. Studies of digital orientation, persistence, and venture strategy are the setting in which a committee would argue about capability and investment [14–17]. They do not produce this alert.
 
 For a founder or investor the practical reading is limited and specific. Under a 5:1 preference, and when the committee codes the antecedents correctly, the card lowers decision cost by a small paired amount and says which rules fired. It still alerts on about half of surviving firms, because that is what Eq. (1) buys. It is not a screen that stays quiet. It is not evidence that digital strategy, taken from survey studies [15–17], predicts failure in the field.
 
@@ -174,7 +168,7 @@ KG-EWS is a warning card for digital-transformation failure in entrepreneurial f
 
 ## Data Availability
 
-The cohorts are synthetic. `ews.py` generates the ventures, fits every model, chooses λ and τ, repeats that choice at miss weights 3 and 8, runs the 60-cohort predicate-flip check, writes `cohort_results.csv`, and redraws both figures. The primary seeds are 9000 through 9119. The stress seeds are 12000 through 12059. The program and the cohort table are in the public repository https://github.com/divzmunagala03-tech/Dba. No external data file is required.
+The cohorts are synthetic. `ews.py` generates the ventures, fits every model, chooses λ and τ, repeats that choice at miss weights 3 and 8, runs the 60-cohort predicate-flip check, writes `cohort_results.csv`, and redraws the figure. The primary seeds are 9000 through 9119. The stress seeds are 12000 through 12059. The program and the cohort table are in the public repository https://github.com/divzmunagala03-tech/Dba. No external data file is required.
 
 ## Declaration of Competing Interest
 

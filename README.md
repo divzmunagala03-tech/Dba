@@ -16,19 +16,18 @@ KG-EWS adds eight committee rules to the log-odds of a logistic score. The rules
 python3 ews.py
 ```
 
-The run writes `fig1_architecture.png`, `fig2_results.png`, `cohort_results.csv`, and `results.json`. Primary cohort seeds are 9000 through 9119. A predicate-flip block uses seeds 12000 through 12059. No network connection and no external data file are required.
+The run writes `fig1_results.png`, `cohort_results.csv`, and `results.json`. Primary cohort seeds are 9000 through 9119. A predicate-flip block uses seeds 12000 through 12059. No network connection and no external data file are required.
 
 ## Files
 
 | File | Role |
 | --- | --- |
 | `ews.py` | Generator, rules, models, paired tests, figures |
-| `PAPER.md` | Manuscript source: two figures and two tables |
+| `PAPER.md` | Manuscript source: one figure and two tables |
 | `manuscript.pdf` | The same manuscript as a PDF |
 | `manuscript.docx` | The same manuscript as a Word file |
 | `highlights.txt` | Separate highlights file for journal upload |
-| `fig1_architecture.png` | Rule-evidence graph for one test failure |
-| `fig2_results.png` | Paired cost advantage and the false-alarm tradeoff |
+| `fig1_results.png` | The one results figure: paired cost advantage and the false-alarm tradeoff |
 | `cohort_results.csv` | Primary cohorts and the predicate-flip cohorts |
 
 ## What the experiment claims

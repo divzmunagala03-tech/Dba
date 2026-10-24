@@ -342,38 +342,6 @@ def summarize(frame: pd.DataFrame) -> dict:
     return summary
 
 
-def plot_architecture(path: Path, case: dict) -> None:
-    plt.rcParams.update({
-        "font.family": "DejaVu Sans",
-        "font.size": 9,
-        "axes.edgecolor": "#292524",
-    })
-    fig, ax = plt.subplots(figsize=(6.6, 4.2), dpi=300)
-    fig.patch.set_facecolor("white")
-    rules = case["rules"]
-    labels = [item["id"] for item in rules]
-    values = [item["evidence"] for item in rules]
-    colors = ["#0f766e" if value > 0 else "#9f1239" for value in values]
-    ypos = np.arange(len(labels))
-    ax.barh(ypos, values, color=colors, height=0.62, zorder=2)
-    ax.axvline(0, color="#44403c", linewidth=0.8)
-    ax.set_yticks(ypos)
-    ax.set_yticklabels(labels)
-    ax.set_xlabel(
-        "Rule evidence added to the log-odds\n"
-        f"Test probabilities:  logistic {case['p_lin']:.2f}   "
-        f"boosting {case['p_ai']:.2f}   rules {case['p_kb']:.2f}   KG-EWS {case['p_kg']:.2f}"
-    )
-    ax.set_title("A rule-triggered failure", loc="left", fontsize=11, pad=8, color="#1c1917")
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.grid(axis="x", color="#e7e5e4", zorder=0)
-    ax.set_xlim(0, max(values) * 1.18 if values else 1)
-    fig.tight_layout()
-    fig.savefig(path, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-
-
 def plot_results(path: Path, summary: dict) -> None:
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9})
     methods = ["lin", "kb", "ai", "kg"]
@@ -503,8 +471,7 @@ def main() -> None:
     summary["miss_weight"] = MISS_WEIGHT
     summary["false_alarm_weight"] = FALSE_ALARM_WEIGHT
     (ROOT / "results.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    plot_architecture(ROOT / "fig1_architecture.png", case)
-    plot_results(ROOT / "fig2_results.png", summary)
+    plot_results(ROOT / "fig1_results.png", summary)
     printable = {key: summary[key] for key in summary if key != "case"}
     printable["case"] = case
     print(json.dumps(printable, indent=2))
